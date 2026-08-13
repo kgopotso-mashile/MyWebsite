@@ -2,7 +2,7 @@
 #The name of my website is NailedByKoketso
 ---
 
-##Student Information
+Student Information
 
 Name: Mashile Kgopotso
 
