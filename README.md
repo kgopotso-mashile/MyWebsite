@@ -2,7 +2,7 @@
 #The name of my website is NailedByKoketso
 ---
 
-Student Information
+##Student Information
 
 Name: Mashile Kgopotso
 
@@ -35,3 +35,13 @@ The website will consist of 3Parts. Part1 which consists of the plan, research a
 The website will consist of 5 pages in total; these 5 pages will help customers and clients navigate and get their way on the website without struggling. The Home page, About-Us page, Contact-Us, Enquiry and Services. The Services page will display all the services that are offered at NailedByKoketso, starting from women to men!
 
 ---
+##References
+
+(Koketso Mangena, 2026)
+(K.L, 2022)
+(Chaffey D, 2022)
+(Network, 2024)
+
+
+
+
