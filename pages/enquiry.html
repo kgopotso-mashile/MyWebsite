@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NAILEDBYKOKETSO💅💅🏾 | ENQUIRY</title>
+    <title>NAILEDBYKOKETSO | ENQUIRY</title>
 </head>
 <body>
      <header>
@@ -21,40 +21,78 @@
     </header>
      <main> <!--THIS IS THE MAIN SECTION-->
         <section>
-            <h1 style="text-align: left; color: pink;">ENQUIRY AND SERVICE BOOKING</h1>
+            <h1>ENQUIRY AND SERVICE BOOKING</h1>
             <h3 style="text-align: center;">How Can We Assist You</h3>
              <br\><hr />
              
              <section>
+ <section> <!--NEW SECTION FOR ENQUIRIES-->
+                    <h1 style="text-align: center;">ENQUIRY FORM</h1>
 
-                <h4 style="text-align:left;">YOUR-DETAILS</h4>
-                 <form action="#" method="post">
-                    <label for="name" name="name">YOUR NAME:</label>
-                    <input type="text" id="name" placeholder="PLEASE_TELL_US_WHO_YOU_ARE" required>
-                        
-                        <br /><br />
                     <form action="#" method="post">
-                        <label for="name" name="name">YOUR CONTACT NUMBER:</label><br/>
-                        <input type="text" id="name" placeholder="PLEASE_LEAVE_US_YOUR_PHONE-NUMBER" required>
-                        <br /><br />
+                        <label for="name" name="name">YOUR NAME:</label><br/>
+                        <input type="text" id="name" placeholder="PLEASE_TELL_US_WHO_YOU_ARE." required>
+                        <br/><br/>
+                        <label for="type_of_nail_set" name="type_of_nail_set">TYPE OF NAIL SET</label>
+                        <br />
+                        <!--creating a drop down list-->
+                        <select id="type_of_nail_set" name="type_of_nail_set" required>
+                            <option value="">--SELECT--</option>
+                            <option value="">Square</option>
+                            <option value="">Stilleto</option>
+                            <option value="">Almond</option>
+                            <option value="">Coffin</option>
+                        </select>
+                        <br/><br/>
+                        <!--creating a drop down list-->
+                        <select id="type_of_nail_design" name="type_of_nail_design" required>
+                            <option value="">--SELECT--</option>
+                            <option value="">French</option>
+                            <option value="">Cateye</option>
+                            <option value="">Chrome Glazed</option>
+                            <option value="">3D ART</option>
+                            <option value="">Gel Pedicure</option>
+                            <option value="">Pedicure</option>
+                            <option value="">Buff and Shine</option>
+                            <option value="">Soak Off</option>
+                            </select>
+                             <br/><br/>
 
-                    <label for="message" name="message">Enquiry:</label><br/> 
-            <textarea name="message" rows="20" cols="80" placeholder=" Tell Us What Your Enquiry Is About"required></textarea>
+            <label for="message" name="message">MESSAGE:</label><br/> <!--Displaying a writting space-->
+            <textarea name="message" rows="20" cols="100" placeholder="Tell Us What You Would Like To Do."required>
+            </textarea>
+             <br/><br/>
+             <!--BUTTON-->
+             <button type="submit">SUBMIT</button>
+                    </form>
              </section>
 
              <!--Booking  section-->
              <section>
+                <br /><br /><hr>
                 <form>
-                    <br /><br /><hr>
-                    <h2>Please select your date and attach your design </h2>
+                    <h2>Booking Information</h2>
                     
-            <label for="message" name="message">DESIGN:</label><br/> <!--Displaying a writting space-->
-            <textarea name="message" rows="10" cols="50" placeholder="Tell Us What You Would Like To Do" 
-             required>
-                    <label for="date">Select a date:</label>
+                    <h2>Please select your date and attach your design </h2>
+                    <label for="design-upload"> DESIGN:</label>
+                    <input type="file" id="nail-design-upload" name="design" accept="image/*">
+                    <br>
+                     <br>
+
+                    <label for="date">Select a date for booking:</label>
                     <input type="date" id="date" name="date">
+                     <hr>
                     <br /><br />
                 </form>
              </section>
+             
+             <!--Inserting a footer section-->
+
+             <footer> 
+                <section> 
+                      <h3> We are always ready to respond to your enquiries!</h3>
+                </section>
+              
+             </footer>
 </body>
 </html>
