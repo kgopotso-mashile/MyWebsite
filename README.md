@@ -35,8 +35,16 @@ The website will consist of 3Parts. Part1 which consists of the plan, research a
 The website will consist of 5 pages in total; these 5 pages will help customers and clients navigate and get their way on the website without struggling. The Home page, About-Us page, Contact-Us, Enquiry and Services. The Services page will display all the services that are offered at NailedByKoketso, starting from women to men!
 
 ---
+<<<<<<< HEAD
 ## UPDATES 
 I added a background colour to make it look more attractive.
+=======
+## UPDATES
+
+Added a background colour to my website to make more attractive.
+
+
+>>>>>>> cdc3aab1f2bea49f1ee14d166191f4a08b3fcfc4
 ## References
 
 (Koketso Mangena, 2026)
