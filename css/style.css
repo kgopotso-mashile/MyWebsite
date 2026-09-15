@@ -1,3 +1,4 @@
+
 :root {
   --white: #ffffff;
   --pink-stripe: #f6c7da;
@@ -12,7 +13,20 @@
 }
  
 * { box-sizing: border-box; }
- 
+
+nav {
+  display: flex;
+  align-items:center;
+  justify-content: space-between; /* This makes the logo to the left
+                                      and link to the right*/
+} 
+
+.logo {
+
+  margin-right: auto;
+  /*This pushes everything away from the logo*/
+}
+
 body {
   margin: 0;
   color: var(--ink);
@@ -20,7 +34,8 @@ body {
   line-height: 1.6;
   background: linear-gradient(to bottom, var(--pink-stripe) 0 50%, var(--white) 50% 100%);
 }
- 
+
+
 /* Logo + nav — works whether wrapped in <header> or loose in <body> */
 header { background-color: var(--white); border-bottom: 2px solid var(--gold); }
 header, body > nav { position: sticky; top: 0; z-index: 10; }
@@ -48,7 +63,7 @@ header nav { border-bottom: none; }
  
 nav a {
   text-decoration: none;
-  color: var(--ink);
+  color: var(--pink);
   font-weight: 600;
   letter-spacing: 0.03em;
   padding: 0.4rem 0.2rem;
@@ -165,4 +180,54 @@ footer hr { max-width: 300px; margin: 0.75rem auto; }
   nav a::after, td img { transition: none; }
 }
 
+/* --- Image hover + click-to-open additions --- */
+img {
+  cursor: zoom-in;
+}
+
+body > img:hover,
+nav img:hover,
+main img:hover {
+  transform: scale(1.03);
+  transition: transform 0.2s ease;
+}
+
+/* Lightbox overlay (used by the script below) */
+.img-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  cursor: zoom-out;
+  padding: 2rem;
+}
+.img-lightbox-overlay.active { display: flex; }
+.img-lightbox-overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: 10px;
+  border: 2px solid var(--gold);
+  cursor: default;
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body > img:hover, nav img:hover, main img:hover, td img:hover { transition: none; }
+}
+
+.button[type="submit"] {
+    background-color: #ffb6c1;      /* pink background */
+    color: #88284fc7;                 /* deeper pink text for contrast */
+    font-family: Calibri, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
 
