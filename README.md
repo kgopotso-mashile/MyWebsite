@@ -34,7 +34,47 @@ The website will consist of 3Parts. Part1 which consists of the plan, research a
 
 The website will consist of 5 pages in total; these 5 pages will help customers and clients navigate and get their way on the website without struggling. The Home page, About-Us page, Contact-Us, Enquiry and Services. The Services page will display all the services that are offered at NailedByKoketso, starting from women to men!
 
----
+
+# NAILEDBYKOKETSO  
+
+
+```
+Home
+├── About Us
+│   ├── Our Story
+├── Services
+│   ├── Manicure
+│   │   ├── Classic Manicure
+|   |   ├── Buff and Shine
+│   │   ├── Gel Manicure
+│   │   └── Acrylic Manicure
+│   ├── Pedicure
+│   │   ├── Classic Pedicure
+│   │   ├── Gel Pedicure
+│   │   └── Spa Pedicure
+│   ├── Nail Extensions
+│   │   ├── Acrylic Extensions
+│   │   ├── Gel Extensions
+│   │   └── Poly Gel
+│   ├── Nail Art & Design
+│   └── Add-Ons (Nail Repair, Soak-off)
+├── Gallery / Our Work
+│   ├── Instagram Feed
+│   └── Client Transformations
+├── Pricing
+│   ├── Service Menu
+│   └── Specials & Packages
+├── Booking
+│   ├── Book Online
+│   ├── Gift Vouchers
+├── Reviews 
+└── Contact
+    ├── Location & Hours
+    ├── Contact Form
+    └── FAQs
+```
+
+
 <<<<<<< HEAD
 ## UPDATES 
 I added a background colour to make it look more attractive.
