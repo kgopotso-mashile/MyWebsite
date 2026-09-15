@@ -73,13 +73,8 @@ Home
     ├── Contact Form
     └── FAQs
 ```
-
-
-<<<<<<< HEAD
-## UPDATES 
-I added a background colour to make it look more attractive.
-=======
-## UPDATES
+## About our website 
+The fonts used on our website is Calibri , Arial Blacck and Copperplate Gothic Bold. The website consist of Pink, Gold and black colors which I have used consistantly throughout all the pages. The images has a border radius of 14px and the background colors used consistantley through out the website are pink and white, which where split into equal halves horizontally.
 
 Added a background colour to my website to make more attractive.
 
