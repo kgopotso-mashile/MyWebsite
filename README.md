@@ -50,6 +50,10 @@ I also used CSS to control the layout elements and arrange them. CSS was also us
 The cursor styling, accessibility, hovering, and also the customization of the image was done and included in part2 using CSS styling.All this allowed the page to be responsive to different screen sizes. The hoovering of the cursor over the photos changes and magnifies them when hovering over a picture which makes it more attractive and clear. 
 
 This website allows you to book a nail appointment and also make inquires. We also included links for our social media pages in the footer part of each page so our customers can reach out to us.  
+
+## How it looks on different screens
+
+
 ## References
 
 (Koketso Mangena, 2026)
