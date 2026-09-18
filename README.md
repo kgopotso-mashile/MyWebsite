@@ -38,41 +38,6 @@ The website will consist of 5 pages in total; these 5 pages will help customers 
 # NAILEDBYKOKETSO  
 
 
-```
-Home
-├── About Us
-│   ├── Our Story
-├── Services
-│   ├── Manicure
-│   │   ├── Classic Manicure
-|   |   ├── Buff and Shine
-│   │   ├── Gel Manicure
-│   │   └── Acrylic Manicure
-│   ├── Pedicure
-│   │   ├── Classic Pedicure
-│   │   ├── Gel Pedicure
-│   │   └── Spa Pedicure
-│   ├── Nail Extensions
-│   │   ├── Acrylic Extensions
-│   │   ├── Gel Extensions
-│   │   └── Poly Gel
-│   ├── Nail Art & Design
-│   └── Add-Ons (Nail Repair, Soak-off)
-├── Gallery / Our Work
-│   ├── Instagram Feed
-│   └── Client Transformations
-├── Pricing
-│   ├── Service Menu
-│   └── Specials & Packages
-├── Booking
-│   ├── Book Online
-│   ├── Gift Vouchers
-├── Reviews 
-└── Contact
-    ├── Location & Hours
-    ├── Contact Form
-    └── FAQs
-```
 ## About our website 
 The fonts used on our website is Calibri , Arial Blacck and Copperplate Gothic Bold. The website consist of Pink, Gold and black colors which I have used consistantly throughout all the pages. The images has a border radius of 14px and the background colors used consistantley through out the website are pink and white, which where split into equal halves horizontally.
 
