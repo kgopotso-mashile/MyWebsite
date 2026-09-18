@@ -64,9 +64,9 @@ This website allows you to book a nail appointment and also make inquires. We al
 
 ## How it looks on different screens:
 
-<img src="./assets/Screenshot 2026-09-18 183356.png" alt="Website homepage" width="800">
-<img src="./assets/Screenshot 2026-09-18 183708.pngimages/homepage.png" alt="Website homepage" width="800">
-<img src="./assets/WhatsApp Image 2026-09-18 at 18.35.26.jpegimages/homepage.png" alt="Website homepage" width="800">
+<img src="./assets/Screenshot 2026-09-18 183356.png" alt="Website homepage" width="300">
+<img src="./assets/Screenshot 2026-09-18 183708.pngimages/homepage.png" alt="Website homepage" width="300">
+<img src="./assets/WhatsApp Image 2026-09-18 at 18.35.26.jpegimages/homepage.png" alt="Website homepage" width="300">
 
 ## References
 
