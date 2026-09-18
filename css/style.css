@@ -257,3 +257,32 @@ main img:hover {
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
+
+.scroll-container {
+  overflow: hidden;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.scroll-track {
+  display: flex;
+  width: max-content;
+  animation: scroll-left 40s linear infinite;
+}
+
+.scroll-track img {
+  height: 350px;
+  width: 300px;
+  object-fit: cover;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+@keyframes scroll-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
