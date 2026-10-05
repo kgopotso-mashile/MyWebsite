@@ -33,65 +33,46 @@
  <section> <!--NEW SECTION FOR ENQUIRIES-->
                     <h1 style="text-align: center;">ENQUIRY FORM</h1>
 
-                    <form action="#" method="post">
-                        <label for="name" name="name">YOUR NAME:</label><br/>
-                        <input type="text" id="name" placeholder="PLEASE_TELL_US_WHO_YOU_ARE." required>
-                        <br/><br/>
-                        <label for="type_of_nail_set" name="type_of_nail_set">TYPE OF NAIL SET</label>
-                        <br />
-                        <!--creating a drop down list-->
-                        <select id="type_of_nail_set" name="type_of_nail_set" required>
-                            <option value="">--SELECT--</option>
-                            <option value="">Square</option>
-                            <option value="">Stilleto</option>
-                            <option value="">Almond</option>
-                            <option value="">Coffin</option>
-                        </select>
-                        <br/><br/>
-                        <!--creating a drop down list-->
-                        <select id="type_of_nail_design" name="type_of_nail_design" required>
-                            <option value="">--SELECT--</option>
-                            <option value="">French</option>
-                            <option value="">Cateye</option>
-                            <option value="">Chrome Glazed</option>
-                            <option value="">3D ART</option>
-                            <option value="">Gel Pedicure</option>
-                            <option value="">Pedicure</option>
-                            <option value="">Buff and Shine</option>
-                            <option value="">Soak Off</option>
-                            </select>
-                             <br/><br/>
+            <h1>SERVICE ENQUIRY</h1>
+            <p>Want to know what a service costs or whether we have a slot? Fill in the form and we will show you an estimate straight away.</p>
+ 
+            <form id="enquiryForm" novalidate>
+                <p><label for="name">Full name</label>
+                <input type="text" id="name" name="name" required minlength="2" placeholder="e.g. Thandi Mokoena"></p>
+ 
+                <p><label for="email">Email address</label>
+                <input type="email" id="email" name="email" required placeholder="you@example.com"></p>
+ 
+                <p><label for="phone">Cell number</label>
+                <input type="tel" id="phone" name="phone" required pattern="0[0-9]{9}" title="10 digits, starting with 0 (e.g. 0664224639)" placeholder="0664224639"></p>
+ 
+                <p><label for="service">Service</label>
+                <select id="service" name="service" required>
+                    <option value="">-- Choose a service --</option>
+                    <option value="180">Gel manicure</option>
+                    <option value="350">Acrylic set</option>
+                    <option value="220">Spa manicure</option>
+                    <option value="250">Pedicure</option>
+                    <option value="120">Men's buff and shine</option>
+                </select></p>
+ 
+                <p><label for="people">Number of people</label>
+                <input type="number" id="people" name="people" required min="1" max="10" value="1"></p>
+ 
+                <p><label for="date">Preferred date</label>
+                <input type="date" id="date" name="date" required></p>
+ 
+                <p><label for="time">Preferred time (we are open 08:00 - 19:30)</label>
+                <input type="time" id="time" name="time" required min="08:00" max="19:30"></p>
+ 
+                <p><input type="checkbox" id="art" name="art" style="width:auto">
+                <label for="art">Add nail art / designs (+R50 per person)</label></p>
+ 
+                <p><button type="submit" class="button" style="background-color:#ffb6c1;color:#88284f;font-weight:bold;padding:10px 25px;border:none;border-radius:6px;cursor:pointer;">GET MY ESTIMATE</button></p>
+            </form>
+ 
+            <div id="response" aria-live="polite" style="margin-top:1.5rem;"></div> 
 
-            <label for="message" name="message">MESSAGE:</label><br/> <!--Displaying a writting space-->
-            <textarea name="message" rows="20" cols="100" placeholder="Tell Us What You Would Like To Do."required>
-            </textarea>
-             <br/><br/>
-             <!--BUTTON-->
-             <button type="submit">SUBMIT</button>
-                    </form>
-             </section>
-
-             <!--Booking  section-->
-             <section>
-                <br /><br /><hr>
-                <form>
-                    <h2>Booking Information</h2>
-                    
-                    <h2>Please select your date and attach your design </h2>
-                    <label for="design-upload"> DESIGN:</label>
-                    <input type="file" id="nail-design-upload" name="design" accept="image/*">
-                    <br>
-                     <br>
-
-                    <label for="date">Select a date for booking:</label>
-                    <input type="date" id="date" name="date">
-                     <hr>
-                         <button type="submit">SUBMIT
-                            
-                         </button>
-
-                    <br /><br />
-                </form>
              </section>
              
              <!--Inserting a footer section-->
