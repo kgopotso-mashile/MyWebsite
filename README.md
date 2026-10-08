@@ -38,45 +38,28 @@ The website will consist of 5 pages in total; these 5 pages will help customers 
 # NAILEDBYKOKETSO  
 
 
-```
-Home
-├── About Us
-│   ├── Our Story
-├── Services
-│   ├── Manicure
-│   │   ├── Classic Manicure
-|   |   ├── Buff and Shine
-│   │   ├── Gel Manicure
-│   │   └── Acrylic Manicure
-│   ├── Pedicure
-│   │   ├── Classic Pedicure
-│   │   ├── Gel Pedicure
-│   │   └── Spa Pedicure
-│   ├── Nail Extensions
-│   │   ├── Acrylic Extensions
-│   │   ├── Gel Extensions
-│   │   └── Poly Gel
-│   ├── Nail Art & Design
-│   └── Add-Ons (Nail Repair, Soak-off)
-├── Gallery / Our Work
-│   ├── Instagram Feed
-│   └── Client Transformations
-├── Pricing
-│   ├── Service Menu
-│   └── Specials & Packages
-├── Booking
-│   ├── Book Online
-│   ├── Gift Vouchers
-├── Reviews 
-└── Contact
-    ├── Location & Hours
-    ├── Contact Form
-    └── FAQs
-```
 ## About our website 
-The fonts used on our website is Calibri , Arial Blacck and Copperplate Gothic Bold. The website consist of Pink, Gold and black colors which I have used consistantly throughout all the pages. The images has a border radius of 14px and the background colors used consistantley through out the website are pink and white, which where split into equal halves horizontally.
+The fonts used on our website is Calibri , Arial Black and Copperplate Gothic Bold. The website consist of Pink, Gold and black colors which I have used consistently throughout all the pages. The images has a border radius of 14px and the background colors used consistently through out the website are pink and white, which where split into equal halves horizontally.
 
-Added a background colour to my website to make more attractive.
+Added a background color to my website to make more attractive.
+
+## Part2
+CSS is used to give the website a structure and content. I Used CSS to style texts and topography, like setting the font family, sizes, colors and also the weight.
+I also used CSS to control the layout elements and arrange them. CSS was also used to style the background colors, images and also make the images float and also add borders on my forms.I also created animated transitions.
+
+The cursor styling, accessibility, hovering, and also the customization of the image was done and included in part2 using CSS styling.All this allowed the page to be responsive to different screen sizes. The hoovering of the cursor over the photos changes and magnifies them when hovering over a picture which makes it more attractive and clear. 
+
+This website allows you to book a nail appointment and also make inquires. We also included links for our social media pages in the footer part of each page so our customers can reach out to us.  
+
+## How it looks on different screens
+
+## Part2
+CSS is used to give the website a structure and content. I Used CSS to style texts and topography, like setting the font family, sizes, colors and also the weight.
+I also used CSS to control the layout elements and arrange them. CSS was also used to style the background colors, images and also make the images float and also add borders on my forms.I also created animated transitions.
+
+The cursor styling, accessibility, hovering, and also the customization of the image was done and included in part2 using CSS styling.All this allowed the page to be responsive to different screen sizes. The hoovering of the cursor over the photos changes and magnifies them when hovering over a picture which makes it more attractive and clear. 
+
+This website allows you to book a nail appointment and also make inquires. We also included links for our social media pages in the footer part of each page so our customers can reach out to us. 
 
 ### Part3 
 
@@ -134,7 +117,12 @@ The availability message doesn't check a real booking calendar. It only repeats 
 The prices are placeholders inside your R130–R300 range until you replace them.
 
 
->>>>>>> cdc3aab1f2bea49f1ee14d166191f4a08b3fcfc4
+## How it looks on different screens:
+
+<img src="./assets/Screenshot 2026-09-18 183356.png" alt="Website homepage" width="300">
+<img src="./assets/Screenshot 2026-09-18 183708.pngimages/homepage.png" alt="Website homepage" width="300">
+<img src="./assets/WhatsApp Image 2026-09-18 at 18.35.26.jpegimages/homepage.png" alt="Website homepage" width="300">
+
 ## References
 
 (Koketso Mangena, 2026)
