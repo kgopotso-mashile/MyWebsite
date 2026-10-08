@@ -1,0 +1,746 @@
+
+(() => {
+  'use strict';
+
+  /* ------------------------------------------------------------------
+     CONFIG – change these to your real details
+     ------------------------------------------------------------------ */
+  const CONFIG = {
+    businessName: 'NAILEDBYKOKETSO',
+    recipientEmail: 'info@nailedbykoketso.co.za', // contact form email goes to this address
+    formEndpoint: '',          // optional: a Formspree/Netlify-style URL for real AJAX posting
+    phoneDisplay: '+27 66 422 4639',
+    phoneTel: '+27664224639',
+    openMinutes: 8 * 60,       // 08:00
+    closeMinutes: 19 * 60 + 30, // 19:30
+    street: '93 Govan Mbeki Avenue',
+    address: '93 Govan Mbeki Avenue, Gqeberha Central, Eastern Cape, South Africa',
+    // Fallback position, taken from the Google Maps embed already on your Contact page.
+    // The map first tries to look up the exact address automatically.
+    map: { lat: -33.959557, lng: 25.618054, zoom: 17 }
+  };
+
+  /* Services taken from your Services page. Your site says prices range from R130 to R300,
+     so the exact amounts below are placeholders inside that range – change them to your real prices. */
+  const SERVICES = [
+    { id: 'manicure', name: 'Manicure', cat: 'women', price: 130, mins: 45, kw: [], blurb: 'Neat, polished nails for a fresh, confident look.' },
+    { id: 'buff-and-shine', name: 'Buff and Shine', cat: 'men', price: 130, mins: 30, kw: [], blurb: 'A clean, natural shine. Designs are available too.' },
+    { id: 'nail-art', name: 'Nail Art', cat: 'women', price: 180, mins: 60, kw: ['french', 'cateye', 'chrome', '3d art'], blurb: 'Your desired nail designs, from French to Cateye, Chrome Glazed and 3D art.' },
+    { id: 'acrylic-nails', name: 'Acrylic Nails', cat: 'women', price: 300, mins: 120, kw: ['acrylic'], blurb: 'Full acrylic sets in Square, Stiletto, Almond or Coffin shapes.' },
+    { id: 'gel-pedicure', name: 'Gel Pedicure', cat: 'both', price: 250, mins: 75, kw: [], blurb: 'A long-lasting gel finish for your toes.' },
+    { id: 'pedicure', name: 'Pedicure', cat: 'both', price: 200, mins: 60, kw: [], blurb: 'Pamper your feet from heel to toe.' },
+    { id: 'soak-off', name: 'Soak Off', cat: 'both', price: 130, mins: 30, kw: ['soak'], blurb: 'Safe removal of your set. Only if your set was done by us.' }
+  ];
+
+  /* ------------------------------------------------------------------
+     Small helpers
+     ------------------------------------------------------------------ */
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const el = (tag, attrs = {}, html = '') => {
+    const n = document.createElement(tag);
+    Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+    if (html) n.innerHTML = html;
+    return n;
+  };
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const money = n => 'R' + n.toLocaleString('en-ZA');
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const titleAndPath = (document.title + ' ' + location.pathname).toUpperCase();
+  const PAGE = titleAndPath.includes('SERVICES') ? 'services'
+    : titleAndPath.includes('CONTACT') ? 'contact'
+    : titleAndPath.includes('ENQUIRY') ? 'enquiry'
+    : titleAndPath.includes('ABOUT') ? 'about' : 'home';
+  const inPages = location.pathname.includes('/pages/');
+  const pageUrl = name => (inPages ? '' : 'pages/') + name + '.html';
+
+  /* ------------------------------------------------------------------
+     Styles for everything this script creates (uses your CSS variables)
+     ------------------------------------------------------------------ */
+  function injectStyles() {
+    const css = `
+    .nbk-reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+    .nbk-reveal.nbk-in{opacity:1;transform:none}
+    header.nbk-scrolled,body>nav.nbk-scrolled{box-shadow:0 4px 14px rgba(0,0,0,.12)}
+    nav a.nbk-active{color:var(--gold-deep)}
+    nav a.nbk-active::after{width:100%}
+
+    .nbk-btn{display:inline-block;background:var(--pink);color:#fff;border:0;border-radius:999px;padding:.65rem 1.5rem;font:600 1rem var(--font-body);letter-spacing:.03em;text-decoration:none;cursor:pointer;transition:background .25s,transform .2s,box-shadow .25s;box-shadow:0 3px 10px rgba(201,106,144,.35)}
+    .nbk-btn:hover,.nbk-btn:focus-visible{background:var(--pink-deep);transform:translateY(-2px)}
+    .nbk-btn.nbk-ghost{background:#fff;color:var(--pink-deep);border:2px solid var(--pink);box-shadow:none}
+    .nbk-btn:disabled{opacity:.7;cursor:wait;transform:none}
+    .nbk-cta{text-align:center;margin:1.25rem 0 .5rem}
+    .nbk-open{display:inline-flex;align-items:center;gap:.5rem;font-size:.9rem;padding:.3rem .9rem;border-radius:999px;background:rgba(232,160,187,.18);border:1px solid var(--pink);margin-bottom:.75rem}
+    .nbk-dot{width:.6rem;height:.6rem;border-radius:50%;background:#2e9d5b;animation:nbk-pulse 1.8s infinite}
+    .nbk-open.closed .nbk-dot{background:#b44;animation:none}
+    @keyframes nbk-pulse{0%{box-shadow:0 0 0 0 rgba(46,157,91,.55)}100%{box-shadow:0 0 0 8px rgba(46,157,91,0)}}
+
+    #nbk-top{position:fixed;right:1.2rem;bottom:1.2rem;width:2.8rem;height:2.8rem;border-radius:50%;border:2px solid var(--gold);background:#fff;color:var(--pink-deep);font-size:1.2rem;cursor:pointer;opacity:0;visibility:hidden;transform:translateY(10px);transition:all .3s;z-index:20;box-shadow:0 3px 10px rgba(0,0,0,.2)}
+    #nbk-top.show{opacity:1;visibility:visible;transform:none}
+
+    /* tabs + toolbar + cards */
+    .nbk-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0}
+    .nbk-tab{border:2px solid var(--pink);background:#fff;color:var(--pink-deep);padding:.45rem 1.1rem;border-radius:999px;font:600 .95rem var(--font-body);cursor:pointer;transition:all .2s}
+    .nbk-tab[aria-selected="true"]{background:var(--pink);color:#fff}
+    .nbk-toolbar{display:flex;gap:.75rem;flex-wrap:wrap}
+    .nbk-toolbar input{flex:2 1 220px;width:auto}
+    .nbk-toolbar select{flex:1 1 170px;width:auto}
+    .nbk-meta{font-size:.9rem;margin:.75rem 0 0}
+    .nbk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-top:1rem}
+    .nbk-card{background:#fff;border:1px solid rgba(232,160,187,.6);border-top:4px solid var(--gold);border-radius:12px;padding:1.1rem;display:flex;flex-direction:column;gap:.4rem;box-shadow:0 2px 10px rgba(0,0,0,.08);animation:nbk-pop .45s ease both;transition:transform .2s,box-shadow .2s}
+    .nbk-card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,.14)}
+    .nbk-card h3{margin:0;font-weight:bold;font-size:1.1rem}
+    .nbk-card p{margin:0;font-size:.92rem}
+    .nbk-price{font:bold 1.25rem var(--font-display);color:var(--gold-deep)}
+    .nbk-card .nbk-btn{margin-top:auto;text-align:center;padding:.5rem 1rem;font-size:.9rem}
+    .nbk-tag{align-self:flex-start;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;background:rgba(232,160,187,.25);color:var(--pink-deep);padding:.15rem .6rem;border-radius:999px}
+    mark{background:rgba(201,162,39,.35);padding:0 2px;border-radius:3px}
+    @keyframes nbk-pop{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+
+    /* accordion */
+    .nbk-acc-item{border:1px solid rgba(232,160,187,.6);border-radius:10px;margin-bottom:.6rem;overflow:hidden;background:#fff}
+    .nbk-acc-btn{width:100%;display:flex;justify-content:space-between;align-items:center;gap:1rem;background:rgba(232,160,187,.12);border:0;padding:.85rem 1.1rem;font:600 1rem var(--font-body);color:var(--ink);text-align:left;cursor:pointer}
+    .nbk-acc-btn::after{content:"+";font-size:1.4rem;color:var(--pink-deep);transition:transform .3s}
+    .nbk-acc-btn[aria-expanded="true"]::after{transform:rotate(45deg)}
+    .nbk-acc-panel{max-height:0;overflow:hidden;transition:max-height .35s ease}
+    .nbk-acc-panel p{padding:.2rem 1.1rem .9rem;margin:.6rem 0 0}
+
+    /* modal */
+    .nbk-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:1rem;z-index:900;animation:nbk-fade .25s ease}
+    .nbk-modal{background:#fff;border:2px solid var(--gold);border-radius:14px;max-width:440px;width:100%;padding:1.75rem;position:relative;animation:nbk-pop .3s ease}
+    .nbk-modal h2{margin-bottom:.4rem}
+    .nbk-modal .nbk-x{position:absolute;top:.5rem;right:.8rem;border:0;background:none;font-size:1.7rem;cursor:pointer;color:var(--pink-deep)}
+    .nbk-modal .nbk-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.1rem}
+    @keyframes nbk-fade{from{opacity:0}to{opacity:1}}
+
+    /* lightbox arrows */
+    .nbk-lb-nav{position:absolute;top:50%;transform:translateY(-50%);border:0;background:rgba(255,255,255,.9);color:var(--pink-deep);width:3rem;height:3rem;border-radius:50%;font-size:1.5rem;cursor:pointer}
+    .nbk-lb-prev{left:1.2rem}.nbk-lb-next{right:1.2rem}
+    .nbk-lb-count{position:absolute;bottom:1rem;left:0;right:0;text-align:center;color:#fff;font-size:.9rem}
+
+    /* forms */
+    form label{display:block;font-weight:600;margin:1rem 0 .3rem}
+    form input[type=checkbox],form input[type=radio]{width:auto;margin-right:.4rem}
+    .nbk-invalid{border-color:#c0392b !important;background:#fff6f6}
+    .nbk-valid{border-color:#2e9d5b !important}
+    .nbk-error{color:#b03030;font-size:.85rem;margin-top:.25rem;min-height:0}
+    .nbk-hint{color:var(--gold-deep);font-size:.88rem;margin-top:.25rem}
+    .nbk-char{display:block;text-align:right;font-size:.8rem;color:#555}
+    .nbk-shake{animation:nbk-shake .45s}
+    @keyframes nbk-shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+    .nbk-result{background:linear-gradient(135deg,rgba(246,199,218,.45),#fff);border:2px solid var(--gold);border-radius:14px;padding:1.5rem;animation:nbk-pop .5s ease}
+    .nbk-result h2{margin-top:0}
+    .nbk-result dl{display:grid;grid-template-columns:auto 1fr;gap:.4rem 1rem;margin:1rem 0}
+    .nbk-result dt{font-weight:bold}.nbk-result dd{margin:0}
+    .nbk-result .nbk-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem}
+    .nbk-note{font-size:.85rem;color:#444}
+
+    /* map (Leaflet images must ignore the site's global "main img" rules) */
+    #nbk-map{height:340px;border:2px solid var(--gold);border-radius:12px;margin-top:1rem;z-index:1}
+    .leaflet-container img,main .leaflet-container img{margin:0 !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;cursor:inherit}
+    @media(prefers-reduced-motion:reduce){.nbk-reveal{opacity:1;transform:none;transition:none}.nbk-card,.nbk-result,.nbk-modal{animation:none}}
+    `;
+    const s = el('style', { id: 'nbk-js-styles' });
+    s.textContent = css;
+    document.head.appendChild(s);
+  }
+
+  /* ------------------------------------------------------------------
+     Generic modal
+     ------------------------------------------------------------------ */
+  function openModal(html) {
+    const bg = el('div', { class: 'nbk-modal-bg', role: 'dialog', 'aria-modal': 'true' });
+    const box = el('div', { class: 'nbk-modal' }, `<button class="nbk-x" aria-label="Close">&times;</button>${html}`);
+    bg.appendChild(box);
+    document.body.appendChild(bg);
+    const prevFocus = document.activeElement;
+    const close = () => { bg.remove(); document.removeEventListener('keydown', onKey); prevFocus && prevFocus.focus && prevFocus.focus(); };
+    const onKey = e => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', onKey);
+    bg.addEventListener('click', e => { if (e.target === bg) close(); });
+    $('.nbk-x', box).addEventListener('click', close);
+    const first = $('a,button:not(.nbk-x)', box);
+    (first || $('.nbk-x', box)).focus();
+    return { close, box };
+  }
+
+  /* ------------------------------------------------------------------
+     Site-wide: nav highlight, header shadow, back-to-top, reveal
+     ------------------------------------------------------------------ */
+  function initSiteWide() {
+    // highlight the current page in the nav
+    const here = location.pathname.split('/').pop() || 'index.html';
+    $$('nav a').forEach(a => {
+      const target = (a.getAttribute('href') || '').split('/').pop();
+      if (target === here) { a.classList.add('nbk-active'); a.setAttribute('aria-current', 'page'); }
+    });
+
+    // header shadow
+    const bar = $('header') || $('body > nav');
+    const topBtn = el('button', { id: 'nbk-top', 'aria-label': 'Back to top' }, '&uarr;');
+    document.body.appendChild(topBtn);
+    topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
+    const onScroll = () => {
+      bar && bar.classList.toggle('nbk-scrolled', window.scrollY > 10);
+      topBtn.classList.toggle('show', window.scrollY > 400);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // reveal sections on scroll
+    const items = $$('main section, footer');
+    if (!reduceMotion && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('nbk-in'); io.unobserve(e.target); } });
+      }, { threshold: 0.08 });
+      items.forEach(i => { i.classList.add('nbk-reveal'); io.observe(i); });
+    }
+  }
+
+  /* ------------------------------------------------------------------
+     Lightbox gallery (uses the .img-lightbox-overlay styles in style.css)
+     ------------------------------------------------------------------ */
+  function initLightbox() {
+    const ov = el('div', { class: 'img-lightbox-overlay', role: 'dialog', 'aria-label': 'Image preview' });
+    const big = el('img');
+    const prev = el('button', { class: 'nbk-lb-nav nbk-lb-prev', 'aria-label': 'Previous image' }, '&#10094;');
+    const next = el('button', { class: 'nbk-lb-nav nbk-lb-next', 'aria-label': 'Next image' }, '&#10095;');
+    const count = el('div', { class: 'nbk-lb-count' });
+    ov.append(big, prev, next, count);
+    document.body.appendChild(ov);
+
+    let group = [], idx = 0;
+    const show = () => {
+      const img = group[idx];
+      big.src = img.currentSrc || img.src;
+      big.alt = img.alt || '';
+      const multi = group.length > 1;
+      prev.style.display = next.style.display = count.style.display = multi ? '' : 'none';
+      count.textContent = `${idx + 1} / ${group.length}`;
+    };
+    const open = img => {
+      group = $$('main td img').includes(img) ? $$('main td img') : [img];
+      idx = group.indexOf(img);
+      show();
+      ov.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    };
+    const close = () => { ov.classList.remove('active'); document.body.style.overflow = ''; };
+    const step = d => { idx = (idx + d + group.length) % group.length; show(); };
+
+    document.addEventListener('click', e => {
+      const img = e.target.closest && e.target.closest('img');
+      if (!img || ov.contains(img) || img.closest('.leaflet-container')) return;
+      open(img);
+    });
+    prev.addEventListener('click', e => { e.stopPropagation(); step(-1); });
+    next.addEventListener('click', e => { e.stopPropagation(); step(1); });
+    ov.addEventListener('click', e => { if (e.target !== big) close(); });
+    document.addEventListener('keydown', e => {
+      if (!ov.classList.contains('active')) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowLeft') step(-1);
+      if (e.key === 'ArrowRight') step(1);
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     Home page: open/closed badge + call-to-action
+     ------------------------------------------------------------------ */
+  function isOpenNow() {
+    const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Johannesburg', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date());
+    const mins = (+parts.find(p => p.type === 'hour').value % 24) * 60 + +parts.find(p => p.type === 'minute').value;
+    return mins >= CONFIG.openMinutes && mins < CONFIG.closeMinutes;
+  }
+
+  function initHome() {
+    const sec = $('main section');
+    if (!sec) return;
+    const open = isOpenNow();
+    const wrap = el('div', { class: 'nbk-cta' }, `
+      <div class="nbk-open ${open ? '' : 'closed'}"><span class="nbk-dot"></span>${open ? 'We are open now' : 'Currently closed – open daily 08:00–19:30'}</div><br>
+      <a class="nbk-btn" href="${pageUrl('enquiry')}">Make an Enquiry</a>
+      <a class="nbk-btn nbk-ghost" href="${pageUrl('services')}">View Services</a>`);
+    const h1s = $$('h1', sec);
+    (h1s.length ? h1s[h1s.length - 1] : sec.firstElementChild).after(wrap);
+  }
+
+  /* ------------------------------------------------------------------
+     FAQ accordion (about / enquiry / contact)
+     ------------------------------------------------------------------ */
+  function initAccordion() {
+    const main = $('main');
+    if (!main) return;
+    const faqs = [
+      ['What are your opening hours?', 'We are open every day, Monday to Sunday, from 08:00 to 19:30.'],
+      ['Do you offer services for men?', 'Yes! Women can choose their desired nail designs and men can get a buff and shine, which can also include designs.'],
+      ['How do I make a booking or ask about prices?', `Use our Enquiry page for an estimated cost and availability, or call us on ${CONFIG.phoneDisplay}.`],
+      ['What do your services cost?', 'We offer student-friendly prices ranging from R130 to R300, depending on the service and design.'],
+      ['How long does a treatment take?', 'It depends on the treatment – a buff and shine is quick, while a full acrylic set takes longer. Check the Services page for estimated times.']
+    ];
+    const sec = el('section', { id: 'nbk-faq' }, '<h2>Frequently Asked Questions</h2>');
+    faqs.forEach(([q, a], i) => {
+      const item = el('div', { class: 'nbk-acc-item' }, `
+        <button class="nbk-acc-btn" aria-expanded="false" aria-controls="nbk-faq-${i}" id="nbk-faq-btn-${i}">${esc(q)}</button>
+        <div class="nbk-acc-panel" id="nbk-faq-${i}" role="region" aria-labelledby="nbk-faq-btn-${i}"><p>${esc(a)}</p></div>`);
+      sec.appendChild(item);
+    });
+    sec.addEventListener('click', e => {
+      const btn = e.target.closest('.nbk-acc-btn');
+      if (!btn) return;
+      const panel = $('#' + btn.getAttribute('aria-controls'));
+      const willOpen = btn.getAttribute('aria-expanded') !== 'true';
+      $$('.nbk-acc-btn', sec).forEach(b => { b.setAttribute('aria-expanded', 'false'); $('#' + b.getAttribute('aria-controls')).style.maxHeight = '0'; });
+      if (willOpen) { btn.setAttribute('aria-expanded', 'true'); panel.style.maxHeight = panel.scrollHeight + 'px'; }
+    });
+    main.appendChild(sec);
+  }
+
+  /* ------------------------------------------------------------------
+     Services page: dynamic service finder (tabs + search + sort + modal)
+     ------------------------------------------------------------------ */
+  function initServices() {
+    const main = $('main');
+    if (!main) return;
+    const sec = el('section', { id: 'nbk-finder' }, `
+      <h2>Find Your Perfect Treatment</h2>
+      <p>Search, filter and sort our services to find what suits you.</p>
+      <div class="nbk-tabs" role="tablist" aria-label="Service category">
+        <button class="nbk-tab" role="tab" data-cat="all" aria-selected="true">All</button>
+        <button class="nbk-tab" role="tab" data-cat="women" aria-selected="false">Women</button>
+        <button class="nbk-tab" role="tab" data-cat="men" aria-selected="false">Men</button>
+      </div>
+      <div class="nbk-toolbar">
+        <input type="search" id="nbk-search" placeholder="Search services (e.g. gel, pedicure)…" aria-label="Search services">
+        <select id="nbk-sort" aria-label="Sort services">
+          <option value="default">Sort: Featured</option>
+          <option value="low">Price: Low to High</option>
+          <option value="high">Price: High to Low</option>
+          <option value="az">Name: A to Z</option>
+        </select>
+      </div>
+      <p class="nbk-meta" id="nbk-count" aria-live="polite"></p>
+      <div class="nbk-grid" id="nbk-grid"></div>`);
+    main.prepend(sec);
+
+    const state = { cat: 'all', q: '', sort: 'default' };
+    const grid = $('#nbk-grid'), countEl = $('#nbk-count');
+    const highlight = text => {
+      if (!state.q) return esc(text);
+      const re = new RegExp('(' + state.q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+      return esc(text).replace(re, '<mark>$1</mark>');
+    };
+
+    function render() {
+      let list = SERVICES.filter(s => (state.cat === 'all' || s.cat === state.cat || s.cat === 'both')
+        && (s.name + ' ' + s.blurb).toLowerCase().includes(state.q.toLowerCase()));
+      if (state.sort === 'low') list.sort((a, b) => a.price - b.price);
+      if (state.sort === 'high') list.sort((a, b) => b.price - a.price);
+      if (state.sort === 'az') list.sort((a, b) => a.name.localeCompare(b.name));
+      countEl.textContent = list.length ? `Showing ${list.length} service${list.length > 1 ? 's' : ''}` : '';
+      grid.innerHTML = list.length ? list.map((s, i) => `
+        <article class="nbk-card" style="animation-delay:${i * 60}ms">
+          <span class="nbk-tag">${s.cat === 'both' ? 'Everyone' : s.cat === 'men' ? 'Men' : 'Women'}</span>
+          <h3>${highlight(s.name)}</h3>
+          <p>${highlight(s.blurb)}</p>
+          <p>⏱ about ${s.mins} min</p>
+          <div class="nbk-price">from ${money(s.price)}</div>
+          <button class="nbk-btn" data-id="${s.id}">View details</button>
+        </article>`).join('')
+        : '<p>No services match your search. Try a different word or category.</p>';
+    }
+
+    $$('.nbk-tab', sec).forEach(tab => tab.addEventListener('click', () => {
+      $$('.nbk-tab', sec).forEach(t => t.setAttribute('aria-selected', String(t === tab)));
+      state.cat = tab.dataset.cat; render();
+    }));
+    $('#nbk-search').addEventListener('input', e => { state.q = e.target.value.trim(); render(); });
+    $('#nbk-sort').addEventListener('change', e => { state.sort = e.target.value; render(); });
+    grid.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-id]');
+      if (!btn) return;
+      const s = SERVICES.find(x => x.id === btn.dataset.id);
+      openModal(`
+        <h2>${esc(s.name)}</h2>
+        <p>${esc(s.blurb)}</p>
+        <p><strong>From:</strong> ${money(s.price)}<br><strong>Time:</strong> about ${s.mins} minutes</p>
+        <p class="nbk-note">Final price depends on length, design and extras.</p>
+        <div class="nbk-actions">
+          <a class="nbk-btn" href="enquiry.html?service=${encodeURIComponent(s.id)}">Enquire about this</a>
+          <a class="nbk-btn nbk-ghost" href="tel:${CONFIG.phoneTel}">Call us</a>
+        </div>`);
+    });
+    render();
+  }
+
+  /* ------------------------------------------------------------------
+     Form engine: validation, error messages, AJAX submission
+     ------------------------------------------------------------------ */
+  async function submitAjax(payload) {
+    // Without an endpoint the request is simulated so the page still behaves like AJAX.
+    if (!CONFIG.formEndpoint) { await sleep(900); return { ok: true, simulated: true }; }
+    const res = await fetch(CONFIG.formEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Request failed: ' + res.status);
+    return res.json().catch(() => ({ ok: true }));
+  }
+
+  function enhanceForm(form, onValid) {
+    form.noValidate = true; // we show our own, friendlier messages
+    const fields = () => $$('input,select,textarea', form)
+      .filter(c => !['submit', 'button', 'reset', 'hidden', 'image'].includes(c.type));
+    const keyOf = c => `${c.name} ${c.id} ${c.placeholder || ''}`.toLowerCase();
+
+    const labelOf = c => {
+      const l = (c.id && $(`label[for="${c.id}"]`, form)) || c.closest('label');
+      const txt = l ? l.textContent : (c.getAttribute('aria-label') || c.placeholder || c.name || 'Field');
+      return txt.replace(/[*:]/g, '').replace(/\s+/g, ' ').trim();
+    };
+
+    function validateField(c) {
+      const v = c.value.trim();
+      const key = keyOf(c);
+      const optional = /optional/.test(key) || c.hasAttribute('data-optional');
+
+      if (c.type === 'checkbox') return c.required && !c.checked ? 'Please tick this box to continue.' : '';
+      if (c.type === 'radio') {
+        const group = $$(`input[type=radio][name="${c.name}"]`, form);
+        return group.some(r => r.checked) || optional ? '' : 'Please choose one option.';
+      }
+      if (c.tagName === 'SELECT') {
+        const first = c.options[0];
+        const placeholder = c.selectedIndex === 0 && first && /select|choose|--/i.test(first.text);
+        return (v === '' || placeholder) && !optional ? 'Please choose an option.' : '';
+      }
+      if (c.type === 'file') {
+        const f = c.files && c.files[0];
+        if (!f) return c.required ? 'Please attach a file.' : '';
+        if (!f.type.startsWith('image/')) return 'Please attach an image (JPG, PNG, etc.).';
+        return f.size > 5 * 1024 * 1024 ? 'Image is too large – maximum 5 MB.' : '';
+      }
+      if (!v) return optional ? '' : 'This field is required.';
+
+      if (c.type === 'email' || /email/.test(key))
+        return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? '' : 'Please enter a valid email address (e.g. name@example.com).';
+
+      if (c.type === 'tel' || /phone|cell|mobile|\btel/.test(key)) {
+        const digits = v.replace(/[\s\-()]/g, '');
+        return /^(\+27|0)[1-9]\d{8}$/.test(digits) ? '' : 'Enter a valid South African number (e.g. 066 422 4639 or +27 66 422 4639).';
+      }
+
+      if (c.type === 'date') {
+        const d = new Date(v + 'T00:00:00'), today = new Date(); today.setHours(0, 0, 0, 0);
+        if (isNaN(d)) return 'Please choose a valid date.';
+        if (d < today) return 'Please choose today or a future date.';
+        const max = new Date(today); max.setFullYear(max.getFullYear() + 1);
+        return d > max ? 'Please choose a date within the next year.' : '';
+      }
+
+      if (c.type === 'time') {
+        const [h, m] = v.split(':').map(Number), mins = h * 60 + m;
+        return mins >= CONFIG.openMinutes && mins <= CONFIG.closeMinutes ? '' : 'We are open between 08:00 and 19:30.';
+      }
+
+      if (c.tagName === 'TEXTAREA') {
+        if (v.length < 10) return 'Please write at least 10 characters.';
+        if (v.length > 500) return 'Please keep your message under 500 characters.';
+        return '';
+      }
+
+      if (c.type === 'number') return c.checkValidity() ? '' : (c.validationMessage || 'Please enter a valid number.');
+
+      if (/name/.test(key))
+        return /^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ' -]{1,49}$/.test(v) ? '' : 'Use letters only (2–50 characters).';
+
+      if (v.length < 3) return 'Please enter at least 3 characters.';
+      if (c.maxLength > 0 && v.length > c.maxLength) return `Maximum ${c.maxLength} characters.`;
+      return '';
+    }
+
+    function setError(c, msg) {
+      const group = c.type === 'radio' ? $$(`input[type=radio][name="${c.name}"]`, form) : [c];
+      const anchor = group[group.length - 1];
+      let box = anchor._nbkErr;
+      if (!box) {
+        box = el('div', { class: 'nbk-error', id: 'err-' + Math.random().toString(36).slice(2, 8) });
+        anchor.insertAdjacentElement('afterend', box);
+        anchor._nbkErr = box;
+      }
+      box.textContent = msg;
+      group.forEach(g => {
+        g.classList.toggle('nbk-invalid', !!msg);
+        g.classList.toggle('nbk-valid', !msg && !!(g.value || g.checked));
+        g.setAttribute('aria-invalid', msg ? 'true' : 'false');
+        if (msg) g.setAttribute('aria-describedby', box.id); else g.removeAttribute('aria-describedby');
+      });
+    }
+
+    // live feedback
+    fields().forEach(c => {
+      const check = () => setError(c, validateField(c));
+      c.addEventListener('blur', check);
+      const instant = c.tagName === 'SELECT' || ['checkbox', 'radio', 'file', 'date'].includes(c.type);
+      c.addEventListener(instant ? 'change' : 'input', () => { if (c.classList.contains('nbk-invalid') || instant) check(); });
+      if (c.tagName === 'TEXTAREA') {
+        c.maxLength = 500;
+        const counter = el('small', { class: 'nbk-char' }, '0 / 500');
+        c.insertAdjacentElement('afterend', counter);
+        c.addEventListener('input', () => { counter.textContent = `${c.value.length} / 500`; });
+      }
+    });
+
+    function collect() {
+      const seen = new Set(), rows = [];
+      fields().forEach(c => {
+        if (c.type === 'radio') {
+          if (seen.has(c.name)) return; seen.add(c.name);
+          const picked = $(`input[type=radio][name="${c.name}"]:checked`, form);
+          if (picked) rows.push({ label: labelOf(picked.closest('fieldset') || picked), key: keyOf(c), value: picked.value, ctrl: c });
+          return;
+        }
+        let value = c.value.trim();
+        if (c.tagName === 'SELECT') value = c.options[c.selectedIndex] ? c.options[c.selectedIndex].text.trim() : '';
+        if (c.type === 'checkbox') value = c.checked ? 'Yes' : 'No';
+        if (c.type === 'file') value = c.files && c.files[0] ? c.files[0].name : '';
+        if (value) rows.push({ label: labelOf(c), key: keyOf(c), value, ctrl: c });
+      });
+      return rows;
+    }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      let firstBad = null;
+      fields().forEach(c => { const m = validateField(c); setError(c, m); if (m && !firstBad) firstBad = c; });
+      if (firstBad) {
+        firstBad.focus();
+        form.classList.add('nbk-shake');
+        setTimeout(() => form.classList.remove('nbk-shake'), 500);
+        return;
+      }
+      const btn = $('[type=submit]', form);
+      const original = btn ? (btn.tagName === 'INPUT' ? btn.value : btn.innerHTML) : '';
+      const setBtn = t => { if (!btn) return; btn.tagName === 'INPUT' ? (btn.value = t) : (btn.textContent = t); };
+      if (btn) { btn.disabled = true; setBtn('Sending…'); }
+      try {
+        await onValid(collect());
+      } catch (err) {
+        console.error(err);
+        let msg = $('.nbk-form-error', form);
+        if (!msg) { msg = el('div', { class: 'nbk-error nbk-form-error', role: 'alert' }); form.appendChild(msg); }
+        msg.textContent = `Sorry, something went wrong. Please try again or call us on ${CONFIG.phoneDisplay}.`;
+      } finally {
+        if (btn) { btn.disabled = false; btn.tagName === 'INPUT' ? (btn.value = original) : (btn.innerHTML = original); }
+      }
+    });
+
+    form.addEventListener('reset', () => {
+      fields().forEach(c => { c.classList.remove('nbk-invalid', 'nbk-valid'); c.removeAttribute('aria-invalid'); if (c._nbkErr) c._nbkErr.textContent = ''; });
+    });
+
+    return { fields };
+  }
+
+  function showResult(form, html) {
+    form._nbkCard && form._nbkCard.remove();
+    const card = el('div', { class: 'nbk-result', role: 'status', tabindex: '-1' }, html);
+    form.insertAdjacentElement('afterend', card);
+    form._nbkCard = card;
+    form.hidden = true;
+    card.focus();
+    card.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    const again = $('[data-again]', card);
+    again && again.addEventListener('click', () => { card.remove(); form.reset(); form.hidden = false; $('input,select,textarea', form)?.focus(); });
+  }
+
+  const firstName = rows => {
+    const r = rows.find(x => /name/.test(x.key) && !/user|sur/.test(x.key)) || rows.find(x => /name/.test(x.key));
+    return r ? r.value.split(' ')[0] : 'there';
+  };
+
+  function findService(text, exactOnly = false) {
+    const t = text.toLowerCase();
+    const exact = [...SERVICES].sort((a, b) => b.name.length - a.name.length).find(s => t.includes(s.name.toLowerCase()) || t === s.id);
+    return exact || (exactOnly ? undefined : SERVICES.find(s => s.kw.some(k => t.includes(k))));
+  }
+
+  /* ------------------------------------------------------------------
+     Enquiry page
+     ------------------------------------------------------------------ */
+  function initEnquiry() {
+    $$('form').forEach(form => {
+      enhanceForm(form, async rows => {
+        await submitAjax({ form: 'enquiry', fields: rows.map(r => ({ label: r.label, value: r.value })) });
+
+        const service = rows.map(r => findService(r.value, true)).find(Boolean) || rows.map(r => findService(r.value)).find(Boolean);
+        const dateRow = rows.find(r => r.ctrl.type === 'date');
+        const shapeRow = rows.find(r => /square|stil|almond|coffin/i.test(r.value));
+        let availability = 'We are open Monday to Sunday, 08:00–19:30.';
+        if (dateRow) {
+          const d = new Date(dateRow.value + 'T00:00:00');
+          const nice = d.toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+          availability = `We have openings on ${nice} between 08:00 and 19:30. We will confirm your exact time by phone.`;
+        }
+        showResult(form, `
+          <h2>Thank you, ${esc(firstName(rows))}! 💅</h2>
+          <p>We have received your enquiry. Here is what we can tell you so far:</p>
+          <dl>
+            ${service ? `<dt>Service</dt><dd>${esc(service.name)}</dd>
+            <dt>Estimated cost</dt><dd>from ${money(service.price)}</dd>
+            <dt>Estimated time</dt><dd>about ${service.mins} minutes</dd>` : `<dt>Cost</dt><dd>Our student-friendly prices range from R130 to R300. We will send you an exact quote.</dd>`}
+            ${shapeRow ? `<dt>Nail shape</dt><dd>${esc(shapeRow.value)}</dd>` : ''}
+            <dt>Availability</dt><dd>${esc(availability)}</dd>
+          </dl>
+          <p class="nbk-note">Prices are estimates; the final cost depends on length, design and extras.</p>
+          <div class="nbk-actions">
+            <a class="nbk-btn" href="tel:${CONFIG.phoneTel}">Call ${esc(CONFIG.phoneDisplay)}</a>
+            <button class="nbk-btn nbk-ghost" type="button" data-again>Make another enquiry</button>
+          </div>`);
+      });
+
+      // live price hint under each dropdown that matches a service
+      $$('select', form).forEach(sel => {
+        const hint = el('div', { class: 'nbk-hint' });
+        sel._nbkErr ? sel._nbkErr.after(hint) : sel.insertAdjacentElement('afterend', hint);
+        sel.addEventListener('change', () => {
+          const s = findService(sel.options[sel.selectedIndex].text);
+          hint.textContent = s ? `Estimated from ${money(s.price)} · about ${s.mins} min` : '';
+        });
+      });
+
+      // pre-select service when arriving from the Services page (?service=gel-pedicure)
+      const want = new URLSearchParams(location.search).get('service');
+      const target = SERVICES.find(s => s.id === want);
+      if (target) {
+        for (const sel of $$('select', form)) {
+          const i = [...sel.options].findIndex(o => findService(o.text, true) === target);
+          if (i > -1) { sel.selectedIndex = i; sel.dispatchEvent(new Event('change')); break; }
+        }
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     Contact page: validated form -> email, plus interactive map
+     ------------------------------------------------------------------ */
+  function initContact() {
+    const form = $('form');
+    if (form) {
+      enhanceForm(form, async rows => {
+        await submitAjax({ form: 'contact', to: CONFIG.recipientEmail, fields: rows.map(r => ({ label: r.label, value: r.value })) });
+
+        const subjectRow = rows.find(r => /subject|type|reason/.test(r.key));
+        const subject = `${CONFIG.businessName} website message${subjectRow ? ' – ' + subjectRow.value : ''}`;
+        const body = rows.map(r => `${r.label}: ${r.value}`).join('\n');
+        const mailto = `mailto:${CONFIG.recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+        showResult(form, `
+          <h2>Thanks, ${esc(firstName(rows))}!</h2>
+          <p>Your message is ready to go. Click below to send it to <strong>${esc(CONFIG.recipientEmail)}</strong> from your email app.</p>
+          <dl>${rows.map(r => `<dt>${esc(r.label)}</dt><dd>${esc(r.value)}</dd>`).join('')}</dl>
+          <div class="nbk-actions">
+            <a class="nbk-btn" href="${mailto}">Send email</a>
+            <button class="nbk-btn nbk-ghost" type="button" data-again>Write another message</button>
+          </div>`);
+      });
+    }
+    initMap(form ? form.closest('section') : null);
+  }
+
+  function loadLeaflet() {
+    return new Promise((resolve, reject) => {
+      if (window.L) return resolve();
+      const base = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/';
+      const css = el('link', { rel: 'stylesheet', href: base + 'leaflet.min.css' });
+      document.head.appendChild(css);
+      const js = el('script', { src: base + 'leaflet.min.js' });
+      js.onload = () => { window.L.Icon.Default.imagePath = base + 'images/'; resolve(); };
+      js.onerror = reject;
+      document.head.appendChild(js);
+    });
+  }
+
+  async function initMap(afterSection) {
+    const main = $('main');
+    if (!main) return;
+    const sec = el('section', { id: 'nbk-map-section' }, `
+      <h2>Find Us</h2>
+      <p>📍 ${esc(CONFIG.address)}<br>Open Monday to Sunday, 08:00–19:30.</p>
+      <div id="nbk-map" aria-label="Map showing the salon location"></div>
+      <p><a class="nbk-btn nbk-ghost" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(CONFIG.address)}">Get directions</a></p>`);
+    afterSection ? afterSection.after(sec) : main.appendChild(sec);
+    try {
+      await loadLeaflet();
+      let { lat, lng, zoom } = CONFIG.map;
+      // look up the exact position of the address (free OpenStreetMap geocoder)
+      try {
+        const q = encodeURIComponent(CONFIG.address);
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=za&q=${q}`, { headers: { Accept: 'application/json' } });
+        const hit = (await res.json())[0];
+        if (hit) { lat = +hit.lat; lng = +hit.lon; }
+      } catch (e) { /* keep fallback coordinates */ }
+      const map = L.map('nbk-map', { scrollWheelZoom: false }).setView([lat, lng], zoom);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+      L.marker([lat, lng]).addTo(map)
+        .bindPopup(`<strong>${CONFIG.businessName}</strong><br>${esc(CONFIG.street)}<br>${CONFIG.phoneDisplay}<br>Mon–Sun, 08:00–19:30`)
+        .openPopup();
+      map.once('focus', () => map.scrollWheelZoom.enable()); // zoom with scroll only after clicking the map
+    } catch (err) {
+      $('#nbk-map').innerHTML = '<p style="padding:1rem">The map could not be loaded. Please check your internet connection.</p>';
+    }
+  }
+
+  /* ------------------------------------------------------------------
+     SEO: structured data (LocalBusiness) added to <head>
+     ------------------------------------------------------------------ */
+  function injectStructuredData() {
+    const data = {
+      '@context': 'https://schema.org',
+      '@type': 'NailSalon',
+      name: CONFIG.businessName,
+      telephone: CONFIG.phoneTel,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: CONFIG.street,
+        addressLocality: 'Gqeberha',
+        addressRegion: 'Eastern Cape',
+        addressCountry: 'ZA'
+      },
+      image: new URL($('nav img')?.getAttribute('src') || '', location.href).href,
+      url: location.origin + location.pathname.replace(/pages\/.*$/, ''),
+      openingHoursSpecification: [{
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        opens: '08:00', closes: '19:30'
+      }],
+      geo: { '@type': 'GeoCoordinates', latitude: CONFIG.map.lat, longitude: CONFIG.map.lng }
+    };
+    const s = el('script', { type: 'application/ld+json' });
+    s.textContent = JSON.stringify(data);
+    document.head.appendChild(s);
+  }
+
+  /* ------------------------------------------------------------------
+     Start
+     ------------------------------------------------------------------ */
+  function init() {
+    injectStyles();
+    injectStructuredData();
+    initSiteWide();
+    initLightbox();
+    if (PAGE === 'home') initHome();
+    if (PAGE === 'services') initServices();
+    if (PAGE === 'enquiry') initEnquiry();
+    if (PAGE === 'contact') initContact();
+    if (PAGE !== 'home' && PAGE !== 'services') initAccordion();
+  }
+
+  document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
+})();
+ 
