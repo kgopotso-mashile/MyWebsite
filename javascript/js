@@ -7,7 +7,7 @@
      ------------------------------------------------------------------ */
   const CONFIG = {
     businessName: 'NAILEDBYKOKETSO',
-    recipientEmail: 'info@nailedbykoketso.co.za', // contact form email goes to this address
+    recipientEmail: 'st10524411@rcconnect.edu.za', // contact form email goes to this address
     formEndpoint: '',          // optional: a Formspree/Netlify-style URL for real AJAX posting
     phoneDisplay: '+27 66 422 4639',
     phoneTel: '+27664224639',
