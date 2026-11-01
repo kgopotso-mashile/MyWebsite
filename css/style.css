@@ -37,9 +37,11 @@ body {
   margin: 0;
   color: var(--ink);
   font-family: var(--font-body);
+  font-family :"Lucida Console", "Courier New", monospace;
   line-height: 1.6;
   background: linear-gradient(to bottom, var(--pink-stripe) 0 50%, var(--white) 50% 100%);
 }
+
 
 
 /* Logo + nav — works whether wrapped in <header> or loose in <body> */
