@@ -137,6 +137,9 @@ The prices are placeholders inside your R130–R300 range until you replace them
 (K.L, 2022)
 (Chaffey D, 2022)
 (Network, 2024)
+W3Schools, 2024. *How To Create a Search Bar*. [online] Available at: https://www.w3schools.com/howto/howto_css_searchbar.asp [Accessed 12 Aug 2025].
+Duckett, J., 2014. *JavaScript and jQuery: Interactive Front-End Web Development*. Indianapolis: Wiley.
+Duckett, J., 2014. *HTML and CSS: Design and Build Websites*. Indianapolis: Wiley.
 
 
 
