@@ -111,6 +111,19 @@ If sending fails, a friendly message tells the visitor to try again or call.
 The availability message doesn't check a real booking calendar. It only repeats your opening hours and the date chosen.
 The prices are placeholders inside your R130–R300 range until you replace them.
 
+# Chatbot Assistant
+    - Floating button (💅) on every page
+    - Searches the same SERVICES data
+    - Answers: prices, hours, location, booking info
+    - Example: Type "gel price" or "are you open?"
+
+# Other Enhancements and search feature 
+    - Form validation (email, phone SA format, date, time 08:00-19:30)
+    - Back-to-top button, header shadow on scroll
+    - Image lightbox with keyboard navigation
+    - FAQ accordion
+    - Mobile responsive, SEO LocalBusiness schem
+    - Includes a search feature which allows the customers to search for any dervices they would like to enquire about 
 
 ## How it looks on different screens:
 
