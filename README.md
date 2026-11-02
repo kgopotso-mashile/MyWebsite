@@ -57,7 +57,7 @@ This website allows you to book a nail appointment and also make inquires. We al
 
 
 ### Part3 
-
+This part makes everything easier for the customers as it includes a chatbot and a search feature. Visit our website to explore more
 
 **On every page**
 - Adds the extra styling it needs, so your CSS stays untouched.
