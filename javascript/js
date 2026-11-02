@@ -743,4 +743,14 @@
 
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
 })();
- 
+
+function sendMessage() {
+ let input = document.getElementById('userInput');
+ let chatbox = document.getElementById('chatbox');
+ let userMsg = `<li class='chat-outgoing'><p>${input.value}</p></li>`;
+ chatbox.innerHTML += userMsg;
+ // Simple bot response
+ let botReply = `<li class='chat-incoming'><p>I received: ${input.value}</p></li>`;
+ chatbox.innerHTML += botReply;
+ input.value = '';
+}
